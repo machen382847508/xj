@@ -71,11 +71,13 @@ public class TCPClient extends JFrame {
         shutsend.setBounds(200, 120, 90, 25);
         panel.add(shutsend);
 
-        Thread thread = new Thread(new SocketClientHandler());
-        thread.setDaemon(true);
+
         zhenting.addActionListener(new ActionListener() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
+                Thread thread = new Thread(new SocketClientHandler());
+                thread.setDaemon(true);
                 if(jiptext.getText().trim().equals("")){
                     JOptionPane.showMessageDialog(TCPClient.this, "IP不能为空", "消息提示", JOptionPane.ERROR_MESSAGE);
                 }else if(userText.getText().trim().equals("")){
@@ -87,10 +89,7 @@ public class TCPClient extends JFrame {
         });
 
         shutsend.addActionListener(e -> {
-            System.out.println(true);
-            if(thread.isAlive()){
-                thread.interrupt();
-            }
+            Thread.currentThread().interrupt();
         });
     }
 
@@ -111,6 +110,9 @@ public class TCPClient extends JFrame {
                 int len = 0;
                 int countlen = 0;
                 while ((len = bis.read(bytes)) != -1) {
+                    if(Thread.currentThread().isInterrupted()){
+                        break;
+                    }
                     bos.write(bytes, 0, len);
                     countlen+=len;
                     jtextsize.setText(String.valueOf(countlen));
